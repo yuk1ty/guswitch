@@ -1,0 +1,41 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths-ignore:
+      - "README.md"
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install stable
+
+      - name: Install cargo-related tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-machete
+
+      - name: Test Compile
+        run: cargo test --no-run --locked
+
+      - name: Test
+        run: cargo test
+
+      - name: Clippy
+        run: cargo clippy
+
+      - name: Fmt
+        run: cargo fmt --check
+
+      - name: Check unused dependencies
+        run: cargo machete
