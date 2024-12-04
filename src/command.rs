@@ -8,6 +8,8 @@ use crate::{
     table::make_table,
 };
 
+/// Switching git user according to the target. When `local` is `true`, it switches the local git user.
+/// Otherwise global .gitconfig is updated.
 pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<()> {
     let users: ConfiguredGitUsers = cfg.into();
     let mode = if local {
@@ -84,6 +86,7 @@ fn show_configured_user(mode: &SwitchMode) -> eyre::Result<()> {
     Ok(())
 }
 
+/// Show users in the configuration file in a table format.
 pub fn show_configured_users_list(cfg: LoadedConfiguration) -> eyre::Result<()> {
     let table = make_table(cfg.users);
     println!("{table}");
