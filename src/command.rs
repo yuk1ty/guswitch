@@ -32,7 +32,7 @@ pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<(
             )?;
             show_configured_user(&mode)?;
         }
-        Err(_) => println!("Please try again"),
+        Err(e) => eprintln!("{}", e),
     }
     Ok(())
 }
