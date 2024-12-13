@@ -94,13 +94,16 @@ mod tests {
     #[test]
     fn should_get_home_path_when_xdg_config_home_was_not_set() -> eyre::Result<()> {
         // Arrange
-        std::env::set_var("HOME", "root");
+        let actual_home = std::env::var("HOME")?;
 
         // Act
         let cfg_path = try_resolve_path(None)?;
 
         // Assert
-        assert_eq!(cfg_path, PathBuf::from("root/.config/gus/config.toml"));
+        assert_eq!(
+            cfg_path,
+            PathBuf::from(format!("{actual_home}/.config/gus/config.toml"))
+        );
 
         Ok(())
     }
