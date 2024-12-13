@@ -32,9 +32,10 @@ pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<(
                     .email
                     .as_str(),
             )?;
-            show_configured_user(&mode)?;
+            let output = show_configured_user(&mode)?;
+            println!("{output}");
         }
-        Err(e) => eprintln!("{}", e),
+        Err(e) => eprintln!("{e}"),
     }
     Ok(())
 }
@@ -70,20 +71,19 @@ fn exec_switch_command(mode: &SwitchMode, user_name: &str, email: &str) -> eyre:
     Ok(())
 }
 
-fn show_configured_user(mode: &SwitchMode) -> eyre::Result<()> {
+fn show_configured_user(mode: &SwitchMode) -> eyre::Result<String> {
     let user_name_output = Command::new("git")
         .args(["config", mode.to_arg(), "user.name"])
         .output()?;
     let user_email_output = Command::new("git")
         .args(["config", mode.to_arg(), "user.email"])
         .output()?;
-    println!(
+    Ok(format!(
         "user: {}, email: {} [{}]",
         String::from_utf8(user_name_output.stdout)?.trim(),
         String::from_utf8(user_email_output.stdout)?.trim(),
         mode.to_token(),
-    );
-    Ok(())
+    ))
 }
 
 /// Show users in the configuration file in a table format.
