@@ -57,3 +57,83 @@ pub fn try_load_config(path: impl AsRef<Path>) -> eyre::Result<LoadedConfigurati
     let file = fs::read_to_string(&path)?;
     Ok(toml::from_str(&file)?)
 }
+
+#[cfg(test)]
+mod tests {
+    use std::io::Write;
+    use std::path::PathBuf;
+    use std::{env::temp_dir, fs::File};
+
+    use super::{try_load_config, try_resolve_path};
+
+    #[test]
+    fn should_get_path_from_env_when_xdg_config_home_was_set() -> eyre::Result<()> {
+        // Arrange
+        let xdg_config_home = PathBuf::from("$HOME/.config");
+        std::env::set_var("XDG_CONFIG_HOME", &xdg_config_home);
+
+        // Act
+        let cfg_path = try_resolve_path(None)?;
+
+        // Assert
+        assert_eq!(cfg_path, xdg_config_home.join("gus").join("config.toml"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_get_home_path_when_xdg_config_home_was_not_set() -> eyre::Result<()> {
+        // Arrange
+        std::env::set_var("HOME", "root");
+
+        // Act
+        let cfg_path = try_resolve_path(None)?;
+
+        // Assert
+        assert_eq!(cfg_path, PathBuf::from("root/.config/gus/config.toml"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_get_specific_path_when_overriden() -> eyre::Result<()> {
+        // Arrange
+        let overriden_path = PathBuf::from("/tmp/gus/config.toml");
+
+        // Act
+        let cfg_path = try_resolve_path(Some(overriden_path.clone()))?;
+
+        // Assert
+        assert_eq!(cfg_path, overriden_path);
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_load_and_parse_to_specific_data_structure() -> eyre::Result<()> {
+        // Arrange
+        let dir = temp_dir();
+        let file_path = dir.join("gus").join("config.toml");
+        let mut file = File::create(&file_path)?;
+        writeln!(
+            file,
+            r#"
+            [[users]]
+            name = "Alice"
+            email = "alice.dummy@dummydummy.com"
+            description = "Alice's description"
+            "#
+        )?;
+
+        // Act
+        let loaded = try_load_config(&file_path)?;
+
+        // Assert
+        let actual = loaded.users.first().unwrap();
+        assert_eq!(actual.name, "Alice");
+        assert_eq!(actual.email, "alice.dummy@dummydummy.com");
+        assert_eq!(actual.description, Some("Alice's description".into()));
+
+        Ok(())
+    }
+}
