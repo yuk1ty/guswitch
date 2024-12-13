@@ -8,8 +8,12 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct GitUser {
+    /// The user name.
     pub name: String,
+    /// The email address of the user.
     pub email: String,
+    /// The description of the user.
+    /// Note that description is only shown in listing up command.
     pub description: Option<String>,
 }
 
@@ -20,12 +24,12 @@ pub struct LoadedConfiguration {
 
 impl From<LoadedConfiguration> for ConfiguredGitUsers {
     fn from(config: LoadedConfiguration) -> Self {
-        let cache = config
+        let configured = config
             .users
             .into_iter()
             .map(|user| (user.name, GitUserConfig { email: user.email }))
             .collect::<BTreeMap<GitUserName, GitUserConfig>>();
-        ConfiguredGitUsers(cache)
+        ConfiguredGitUsers(configured)
     }
 }
 
@@ -35,8 +39,14 @@ pub struct GitUserConfig {
     pub email: String,
 }
 
+/// Represents a collection of users that are actually used in switching users.
 pub struct ConfiguredGitUsers(pub BTreeMap<GitUserName, GitUserConfig>);
 
+/// This function try_resolve_path attempts to resolve a configuration file path.
+/// If an overridden path is provided, it uses that path.
+/// Otherwise, it constructs a default path based on the XDG_CONFIG_HOME environment variable or
+/// defaults to $HOME/.config/gus/config.toml.
+/// It returns the resolved path wrapped in an eyre::Result.
 pub fn try_resolve_path(overriden_path: Option<PathBuf>) -> eyre::Result<PathBuf> {
     let cfg_path: PathBuf = match overriden_path {
         Some(path) => path,

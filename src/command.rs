@@ -25,7 +25,7 @@ pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<(
                 &mode,
                 &choice,
                 prompt_arg
-                    .cache
+                    .configured_users
                     .0
                     .get(&choice)
                     .ok_or_eyre("email not found")?
