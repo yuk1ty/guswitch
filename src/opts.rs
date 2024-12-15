@@ -17,3 +17,15 @@ pub struct Opts {
 pub enum GusCommand {
     List,
 }
+
+#[cfg(test)]
+mod tests {
+    use clap::CommandFactory;
+
+    use super::Opts;
+
+    #[test]
+    fn debug_opts() {
+        Opts::command().debug_assert();
+    }
+}

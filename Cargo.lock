@@ -213,6 +213,7 @@ dependencies = [
  "inquire",
  "serde",
  "tabled",
+ "testing_table",
  "toml",
 ]
 
@@ -531,6 +532,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "testing_table"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9491a98ee2ccc17bd4178e29d9dace769bff6cdb5e876b57ab9ef4ef38edd9e"
+dependencies = [
+ "unicode-width 0.2.0",
 ]
 
 [[package]]
