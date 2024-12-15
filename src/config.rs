@@ -126,7 +126,7 @@ mod tests {
     fn should_load_and_parse_to_specific_data_structure() -> eyre::Result<()> {
         // Arrange
         let dir = temp_dir();
-        let file_path = dir.join("gus").join("config.toml");
+        let file_path = dir.join("config.toml");
         let mut file = File::create(&file_path)?;
         writeln!(
             file,
