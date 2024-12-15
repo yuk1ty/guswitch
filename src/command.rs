@@ -3,7 +3,7 @@ use std::process::Command;
 use eyre::OptionExt;
 
 use crate::{
-    config::{ConfiguredGitUsers, LoadedConfiguration},
+    config::{ConfiguredGitUsers, GitUserEmailAddress, GitUserName, LoadedConfiguration},
     prompt::PromptArg,
     table::make_table,
 };
@@ -11,7 +11,7 @@ use crate::{
 /// Switching git user according to the target. When `local` is `true`, it switches the local git user.
 /// Otherwise global .gitconfig is updated.
 pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<()> {
-    let users: ConfiguredGitUsers = cfg.into();
+    let users: ConfiguredGitUsers = cfg.try_into()?;
     let mode = if local {
         SwitchMode::Local
     } else {
@@ -28,9 +28,7 @@ pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<(
                     .configured_users
                     .0
                     .get(&choice)
-                    .ok_or_eyre("email not found")?
-                    .email
-                    .as_str(),
+                    .ok_or_eyre("email not found")?,
             )?;
             let output = show_configured_user(&mode)?;
             println!("{output}");
@@ -61,12 +59,16 @@ impl SwitchMode {
     }
 }
 
-fn exec_switch_command(mode: &SwitchMode, user_name: &str, email: &str) -> eyre::Result<()> {
+fn exec_switch_command(
+    mode: &SwitchMode,
+    user_name: &GitUserName,
+    email: &GitUserEmailAddress,
+) -> eyre::Result<()> {
     Command::new("git")
-        .args(["config", mode.to_arg(), "user.name", user_name])
+        .args(["config", mode.to_arg(), "user.name", user_name.0.as_str()])
         .output()?;
     Command::new("git")
-        .args(["config", mode.to_arg(), "user.email", email])
+        .args(["config", mode.to_arg(), "user.email", email.0.as_str()])
         .output()?;
     Ok(())
 }

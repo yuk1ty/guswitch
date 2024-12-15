@@ -1,9 +1,11 @@
 use std::{
     collections::BTreeMap,
+    fmt::Display,
     fs,
     path::{Path, PathBuf},
 };
 
+use eyre::eyre;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -22,25 +24,54 @@ pub struct LoadedConfiguration {
     pub users: Vec<GitUser>,
 }
 
-impl From<LoadedConfiguration> for ConfiguredGitUsers {
-    fn from(config: LoadedConfiguration) -> Self {
-        let configured = config
-            .users
-            .into_iter()
-            .map(|user| (user.name, GitUserConfig { email: user.email }))
-            .collect::<BTreeMap<GitUserName, GitUserConfig>>();
-        ConfiguredGitUsers(configured)
+impl TryFrom<LoadedConfiguration> for ConfiguredGitUsers {
+    type Error = eyre::Error;
+    fn try_from(config: LoadedConfiguration) -> Result<Self, Self::Error> {
+        let mut configured = BTreeMap::new();
+        for user in config.users {
+            configured.insert(user.name.try_into()?, user.email.try_into()?);
+        }
+        Ok(ConfiguredGitUsers(configured))
     }
 }
 
-type GitUserName = String;
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct GitUserName(pub String);
 
-pub struct GitUserConfig {
-    pub email: String,
+impl TryFrom<String> for GitUserName {
+    type Error = eyre::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.is_empty() {
+            Err(eyre!("User name must not be empty"))
+        } else {
+            Ok(Self(value))
+        }
+    }
+}
+
+impl Display for GitUserName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+pub struct GitUserEmailAddress(pub String);
+
+impl TryFrom<String> for GitUserEmailAddress {
+    type Error = eyre::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.is_empty() {
+            Err(eyre!("Email must not be empty"))
+        } else {
+            Ok(Self(value))
+        }
+    }
 }
 
 /// Represents a collection of users that are actually used in switching users.
-pub struct ConfiguredGitUsers(pub BTreeMap<GitUserName, GitUserConfig>);
+pub struct ConfiguredGitUsers(pub BTreeMap<GitUserName, GitUserEmailAddress>);
 
 /// This function try_resolve_path attempts to resolve a configuration file path.
 /// If an overridden path is provided, it uses that path.
