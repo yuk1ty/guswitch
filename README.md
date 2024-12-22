@@ -1,11 +1,13 @@
 # guswitch
 
-⚠️ This tool is under construction for now!
+A straightforward tool to switch git users on your machine, written in Rust.
+
+![demo](./demo.gif)
 
 ## Getting Started
 
 ```
-TODO
+$ cargo install --git https://github.com/yuk1ty/guswitch.git
 ```
 
 ## Commands
@@ -26,5 +28,14 @@ $ gus --local
 
 ```
 $ gus list
+```
+
+## Configuration File
+
+```
+[[users]]
+name = <git user name>
+email = <git user email>
+description = <description>
 ```
 
