@@ -1,6 +1,6 @@
 # guswitch
 
-A straightforward tool to switch git users on your machine, written in Rust.
+`gsu`(*g*it *s*witch *u*ser) - A straightforward tool to switch git users on your machine, written in Rust.
 
 ![demo](./demo.gif)
 
@@ -15,19 +15,19 @@ $ cargo install --git https://github.com/yuk1ty/guswitch.git
 ### Switch global git user
 
 ```
-$ gus
+$ gsu
 ```
 
 ### Switch local git user
 
 ```
-$ gus --local
+$ gsu --local
 ```
 
 ### Show configured users on your machine
 
 ```
-$ gus list
+$ gsu list
 ```
 
 ## Configuration File
