@@ -10,13 +10,8 @@ use crate::{
 
 /// Switching git user according to the target. When `local` is `true`, it switches the local git user.
 /// Otherwise global .gitconfig is updated.
-pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<()> {
+pub fn exec_user_switch(cfg: LoadedConfiguration, mode: &SwitchMode) -> eyre::Result<()> {
     let users: ConfiguredGitUsers = cfg.try_into()?;
-    let mode = if local {
-        SwitchMode::Local
-    } else {
-        SwitchMode::Global
-    };
     let prompt_arg = PromptArg::new(users);
     let ans = prompt_arg.select.prompt();
     match ans {
@@ -38,7 +33,7 @@ pub fn exec_user_switch(cfg: LoadedConfiguration, local: bool) -> eyre::Result<(
     Ok(())
 }
 
-enum SwitchMode {
+pub enum SwitchMode {
     Global,
     Local,
 }
@@ -73,7 +68,8 @@ fn exec_switch_command(
     Ok(())
 }
 
-fn show_configured_user(mode: &SwitchMode) -> eyre::Result<String> {
+// TODO: localとglobalの両方を出力するようにする
+pub fn show_configured_user(mode: &SwitchMode) -> eyre::Result<String> {
     let user_name_output = Command::new("git")
         .args(["config", mode.to_arg(), "user.name"])
         .output()?;

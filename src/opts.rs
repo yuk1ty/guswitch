@@ -16,6 +16,7 @@ pub struct Opts {
 #[derive(Subcommand)]
 pub enum GusCommand {
     List,
+    Current,
 }
 
 #[cfg(test)]
