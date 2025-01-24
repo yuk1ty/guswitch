@@ -38,6 +38,16 @@ pub enum SwitchMode {
     Local,
 }
 
+impl From<bool> for SwitchMode {
+    fn from(global: bool) -> Self {
+        if global {
+            Self::Global
+        } else {
+            Self::Local
+        }
+    }
+}
+
 impl SwitchMode {
     fn to_arg(&self) -> &str {
         match self {
@@ -68,7 +78,6 @@ fn exec_switch_command(
     Ok(())
 }
 
-// TODO: localとglobalの両方を出力するようにする
 pub fn show_configured_user(mode: &SwitchMode) -> eyre::Result<String> {
     let user_name_output = Command::new("git")
         .args(["config", mode.to_arg(), "user.name"])

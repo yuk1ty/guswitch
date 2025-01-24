@@ -10,13 +10,23 @@ pub struct Opts {
     #[arg(short, long, default_value_t = false)]
     pub local: bool,
     #[command(subcommand)]
-    pub command: Option<GsuCommand>,
+    pub command: GsuCommand,
 }
 
 #[derive(Subcommand)]
 pub enum GsuCommand {
+    #[command(alias = "s")]
+    Switch {
+        #[arg(short, long, default_value_t = false)]
+        global: bool,
+    },
+    #[command(alias = "ls")]
     List,
-    Current,
+    #[command(alias = "g")]
+    Get {
+        #[arg(short, long, default_value_t = false)]
+        global: bool,
+    },
 }
 
 #[cfg(test)]
