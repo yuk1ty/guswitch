@@ -76,7 +76,7 @@ pub struct ConfiguredGitUsers(pub BTreeMap<GitUserName, GitUserEmailAddress>);
 /// This function try_resolve_path attempts to resolve a configuration file path.
 /// If an overridden path is provided, it uses that path.
 /// Otherwise, it constructs a default path based on the XDG_CONFIG_HOME environment variable or
-/// defaults to $HOME/.config/gus/config.toml.
+/// defaults to $HOME/.config/gsu/config.toml.
 /// It returns the resolved path wrapped in an eyre::Result.
 pub fn try_resolve_path(overriden_path: Option<PathBuf>) -> eyre::Result<PathBuf> {
     let cfg_path: PathBuf = match overriden_path {
@@ -86,7 +86,7 @@ pub fn try_resolve_path(overriden_path: Option<PathBuf>) -> eyre::Result<PathBuf
                 std::env::var("XDG_CONFIG_HOME")
                     .unwrap_or_else(|_| format!("{}/.config", std::env::var("HOME").unwrap())),
             );
-            home.push("gus");
+            home.push("gsu");
             home.push("config.toml");
             home
         }
@@ -117,7 +117,7 @@ mod tests {
         let cfg_path = try_resolve_path(None)?;
 
         // Assert
-        assert_eq!(cfg_path, xdg_config_home.join("gus").join("config.toml"));
+        assert_eq!(cfg_path, xdg_config_home.join("gsu").join("config.toml"));
 
         Ok(())
     }
@@ -133,7 +133,7 @@ mod tests {
         // Assert
         assert_eq!(
             cfg_path,
-            PathBuf::from(format!("{actual_home}/.config/gus/config.toml"))
+            PathBuf::from(format!("{actual_home}/.config/gsu/config.toml"))
         );
 
         Ok(())
@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn should_get_specific_path_when_overriden() -> eyre::Result<()> {
         // Arrange
-        let overriden_path = PathBuf::from("/tmp/gus/config.toml");
+        let overriden_path = PathBuf::from("/tmp/gsu/config.toml");
 
         // Act
         let cfg_path = try_resolve_path(Some(overriden_path.clone()))?;

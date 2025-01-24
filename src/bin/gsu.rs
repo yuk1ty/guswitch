@@ -2,7 +2,7 @@ use clap::Parser;
 use guswitch::{
     command::{exec_user_switch, show_configured_user, show_configured_users_list, SwitchMode},
     config::{try_load_config, try_resolve_path},
-    opts::{GusCommand, Opts},
+    opts::{GsuCommand, Opts},
 };
 
 fn main() -> eyre::Result<()> {
@@ -15,8 +15,8 @@ fn main() -> eyre::Result<()> {
         SwitchMode::Global
     };
     match opts.command {
-        Some(GusCommand::List) => show_configured_users_list(cfg),
-        Some(GusCommand::Current) => {
+        Some(GsuCommand::List) => show_configured_users_list(cfg),
+        Some(GsuCommand::Current) => {
             let output = show_configured_user(&mode)?;
             println!("{output}");
             Ok(())

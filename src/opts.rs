@@ -10,11 +10,11 @@ pub struct Opts {
     #[arg(short, long, default_value_t = false)]
     pub local: bool,
     #[command(subcommand)]
-    pub command: Option<GusCommand>,
+    pub command: Option<GsuCommand>,
 }
 
 #[derive(Subcommand)]
-pub enum GusCommand {
+pub enum GsuCommand {
     List,
     Current,
 }
