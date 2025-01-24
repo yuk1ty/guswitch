@@ -33,22 +33,23 @@ pub fn exec_user_switch(cfg: LoadedConfiguration, mode: &SwitchMode) -> eyre::Re
     Ok(())
 }
 
+#[derive(Debug, PartialEq)]
 pub enum SwitchMode {
     Global,
     Local,
 }
 
-impl From<bool> for SwitchMode {
-    fn from(global: bool) -> Self {
+impl SwitchMode {
+    /// If the global flag is turned on, it will prior to the local flag.
+    /// FIXME: This implementation is kind of like counterintuitive. Have to improve this.
+    pub fn new(_local: bool, global: bool) -> Self {
         if global {
             Self::Global
         } else {
             Self::Local
         }
     }
-}
 
-impl SwitchMode {
     fn to_arg(&self) -> &str {
         match self {
             Self::Global => "--global",
@@ -98,4 +99,17 @@ pub fn show_configured_users_list(cfg: LoadedConfiguration) -> eyre::Result<()> 
     let table = make_table(cfg.users);
     println!("{table}");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SwitchMode;
+
+    #[test]
+    fn test_switch_mode_creation() {
+        assert_eq!(SwitchMode::new(false, false), SwitchMode::Local);
+        assert_eq!(SwitchMode::new(true, false), SwitchMode::Local);
+        assert_eq!(SwitchMode::new(false, true), SwitchMode::Global);
+        assert_eq!(SwitchMode::new(true, true), SwitchMode::Global);
+    }
 }
