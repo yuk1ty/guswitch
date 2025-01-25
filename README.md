@@ -12,22 +12,34 @@ $ cargo install --git https://github.com/yuk1ty/guswitch.git
 
 ## Commands
 
-### Switch global git user
+### Switch git user
+
+`gsu {switch|s} [--local|--global]` can switch git users. You can omit `--local` flag and will default to `--local` as well.
 
 ```
-$ gsu
+$ gsu switch --local
+or
+$ gsu s --local
 ```
 
-### Switch local git user
+### Show all configured users in the configuration file
 
-```
-$ gsu --local
-```
-
-### Show configured users on your machine
+`gsu {list|ls}` shows git users that are defined in the configuration file.
 
 ```
 $ gsu list
+or
+$ gsu ls
+```
+
+### Show the current user
+
+`gsu {get|g} [--local|--global]` can display the current user that is configured on your machine. You can omit `--local` flag and will default to `--local` as well.
+
+```
+$ gsu get --local
+or
+$ gsu g --local
 ```
 
 ## Configuration File
