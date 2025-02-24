@@ -111,7 +111,8 @@ mod tests {
     fn should_get_path_from_env_when_xdg_config_home_was_set() -> eyre::Result<()> {
         // Arrange
         let xdg_config_home = PathBuf::from("$HOME/.config");
-        std::env::set_var("XDG_CONFIG_HOME", &xdg_config_home);
+        // TODO: Audit that the environment access only happens in single-threaded code.
+        unsafe { std::env::set_var("XDG_CONFIG_HOME", &xdg_config_home) };
 
         // Act
         let cfg_path = try_resolve_path(None)?;
