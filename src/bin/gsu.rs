@@ -6,6 +6,8 @@ use guswitch::{
 };
 
 fn main() -> eyre::Result<()> {
+    color_eyre::install()?;
+
     let opts = Opts::parse();
     let cfg_path = try_resolve_path(opts.config)?;
     let cfg = try_load_config(cfg_path)?;
