@@ -95,8 +95,24 @@ pub fn try_resolve_path(overriden_path: Option<PathBuf>) -> eyre::Result<PathBuf
 }
 
 pub fn try_load_config(path: impl AsRef<Path>) -> eyre::Result<LoadedConfiguration> {
-    let file = fs::read_to_string(&path)?;
-    Ok(toml::from_str(&file)?)
+    let file = fs::read_to_string(&path).map_err(|err|  {
+        match err.kind() {
+            std::io::ErrorKind::NotFound => {
+                eyre!("Maybe you need to put your configuration file to `$HOME/.config/gsu/config.toml` or `$XDG_CONFIG_HOME/gsu/config.toml`. See more details in README.md of the repo.")
+            }
+            std::io::ErrorKind::PermissionDenied => {
+                eyre!("Permission denied when trying to read the configuration file at `{}`.", path.as_ref().display())
+            }
+            _ => eyre!("Failed to read the configuration file at `{}`: {}", path.as_ref().display(), err),
+        }
+    })?;
+    Ok(toml::from_str(&file).map_err(|err| {
+        eyre!(
+            "Failed to read the file for some reason. [path: {}, reason: {}]",
+            path.as_ref().display(),
+            err.message()
+        )
+    })?)
 }
 
 #[cfg(test)]
